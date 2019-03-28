@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using InvoiceDataStore.BL.Clients.Stereotype;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
@@ -25,7 +24,7 @@ namespace Cimpress.Stereotype
         {
             _accessToken = accessToken;
             _stereotypeClientOptions = options;
-            _logger = logger;
+            _logger = logger ?? new LoggerFactory().CreateLogger("StereotypeClient");
         }
 
         public IStereotypeRequest Request()

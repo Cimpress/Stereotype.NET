@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
-using InvoiceDataStore.BL.Clients.Stereotype;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
@@ -13,23 +13,26 @@ namespace Cimpress.Stereotype
         private const string StereotypeUrl = "https://stereotype.trdlnk.cimpress.io";
         
         private readonly ILogger _logger;
-
-        private readonly RestClient _client;
         
         private readonly IStereotypeClientOptions _stereotypeClientOptions;
         
-        private string _accessToken;
+        private readonly string _accessToken;
         
-        private RestClient _restClient;
+        private readonly IRestClient _restClient;
         
         private string _templateId;
 
-        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger)
+        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger, IRestClient restClient)
         {
             _stereotypeClientOptions = options;
             _accessToken = accessToken;
             _logger = logger;
-            _restClient = new RestClient(options.ServiceBaseUrl);
+            _restClient = restClient;
+        }
+        
+        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger) : this(accessToken, options, logger,  new RestClient(options.ServiceBaseUrl))
+        {
+           
         }
 
         public IStereotypeRequest SetTemplateId(string templateId)
@@ -38,18 +41,17 @@ namespace Cimpress.Stereotype
             return this;
         }
 
-        public IMaterializationResponse<TI> Materialize<TI, TO>(TO payload)
+        public async Task<IMaterializationResponse> Materialize<TO>(TO payload)
         {
             var request = new RestRequest("/v1/templates/{templateId}/materializations", Method.POST);
+            request.JsonSerializer = new JsonSerializer();
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
             request.AddUrlSegment("templateId", _templateId);
-
-            var json = JsonConvert.SerializeObject(payload);
-            _logger.LogInformation($">> POST /v1/templates/{_templateId}/materializations :: {json}");
-            request.AddJsonBody(json);
-            var response = _client.Execute(request);
-            _logger.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {json} :: {response.StatusCode}");
+            _logger.LogInformation($">> POST /v1/templates/{_templateId}/materializations");
+            request.AddJsonBody(payload);
+            var response = await _restClient.ExecuteTaskAsync(request);
+            _logger.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {response.StatusCode}");
             switch (response.StatusCode)
             {
                 case System.Net.HttpStatusCode.OK:
@@ -60,8 +62,18 @@ namespace Cimpress.Stereotype
                         .Where(x => x.Name == "Location")
                         .Select(x => x.Value)
                         .FirstOrDefault();
-                    return new MaterializationResponse<TI>(_accessToken, new Uri(locationHeaderValue.ToString()),
-                        _logger);
+                    if (locationHeaderValue == null)
+                    {
+                        throw new StereotypeException($"Materialization without location", null);
+                    }
+                    return new MaterializationResponse(_accessToken, new Uri(_stereotypeClientOptions.ServiceBaseUrl + locationHeaderValue.ToString()),
+                        _logger, _restClient);
+                case System.Net.HttpStatusCode.NotFound:
+                    return null;
+                case System.Net.HttpStatusCode.Unauthorized:
+                    throw new AuthenticationException("Incorrect authentication");
+                case System.Net.HttpStatusCode.Forbidden:
+                    throw new AuthorizationException("Insufficient permission level to access materialization");
                 default:
                     throw new StereotypeException($"Unexpected status code {response.StatusCode}", null);
             }            

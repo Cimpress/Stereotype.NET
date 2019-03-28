@@ -1,12 +1,14 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Cimpress.Stereotype
 {
-    public class MaterializationResponse<T> : IMaterializationResponse<T>
+    public class MaterializationResponse : IMaterializationResponse
     {
         private readonly string _accessToken;
         private readonly ILogger _logger;
@@ -25,9 +27,10 @@ namespace Cimpress.Stereotype
            
         }
 
-        public async Task<byte[]> Fetch()
+        public async Task<byte[]> FetchBytes()
         {
             var request = new RestRequest(Uri, Method.GET);
+            request.JsonSerializer = new JsonSerializer();
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
             _logger.LogDebug($">> GET {Uri}");
@@ -54,6 +57,20 @@ namespace Cimpress.Stereotype
         }
 
         public Uri Uri { get; }
+
+        public async Task<string> FetchString()
+        {
+            var bytes = await FetchBytes();
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        public async Task<T> FetchJson<T>()
+        {
+            var bytes = await FetchBytes();
+            var bytesAsString = Encoding.UTF8.GetString(bytes);
+            return JsonConvert.DeserializeObject<T>(bytesAsString);
+        }
+       
     }
 
 }

@@ -3,10 +3,14 @@ using System.Threading.Tasks;
 
 namespace Cimpress.Stereotype
 {
-    public interface IMaterializationResponse<T>
+    public interface IMaterializationResponse
     {
-        Task<byte[]> Fetch();
+        Task<byte[]> FetchBytes();
+        
+        Uri Uri { get; }
+        
+        Task<string> FetchString();
 
-        Uri Uri { get; }        
+        Task<T> FetchJson<T>();
     }
 }

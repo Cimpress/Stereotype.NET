@@ -11,12 +11,12 @@ using Xunit;
 
 namespace Cimpress.Stereotype.UnitTests
 {
-    public class MaterializationResponseTests
+    public class StereotypeRequestTests
     {
-        private IMaterializationResponse _materializationResponse;
+        private IStereotypeRequest _stereotypeRequest;
 
         [Fact]
-        public void FetchesMaterializationBytesFromUrl()
+        public void MaterializeTriggersMaterialization()
         {
             var mockedLogger = new Mock<Microsoft.Extensions.Logging.ILogger>();
             mockedLogger.Setup(a => a.Log<object>(   
@@ -29,17 +29,18 @@ namespace Cimpress.Stereotype.UnitTests
             var mockedRestClient = new Mock<IRestClient>();
             var mockedRestResponse = new Mock<IRestResponse>();
             var bytes = new byte[] {(byte) 'T', (byte) 'E', (byte) 'S', (byte) 'T'};
-            mockedRestResponse.Setup(a => a.RawBytes).Returns(bytes);
+            mockedRestResponse.Setup(a => a.Headers).Returns(new List<Parameter>() { new Parameter("Location", "/materialization/1122", ParameterType.HttpHeader)});
             mockedRestResponse.Setup(a => a.StatusCode).Returns(HttpStatusCode.OK);
 
             mockedRestClient.Setup(a => a.ExecuteTaskAsync(It.IsAny<IRestRequest>())).ReturnsAsync(mockedRestResponse.Object);
-            _materializationResponse = new MaterializationResponse(
+            _stereotypeRequest = new StereotypeRequest(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZS",
-                new Uri("https://some.site/materialization.json"),
+                new StereotypeClientOptions(), 
                 mockedLogger.Object,
                 mockedRestClient.Object);
 
-            Assert.Equal<byte>(bytes, _materializationResponse.FetchBytes().Result);
+            var materialization = _stereotypeRequest.SetTemplateId("test-template").Materialize<string>("something");
+            Assert.Equal("https://stereotype.trdlnk.cimpress.io/materialization/1122", materialization.Result.Uri.ToString());
         }
     }
 }

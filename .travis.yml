@@ -1,0 +1,17 @@
+language: csharp
+mono: none
+dotnet: 2.1.503
+install:
+- dotnet restore
+script:
+- dotnet test
+- dotnet build -c Release
+- dotnet publish -c Release
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: dotnet nuget push Cimpress.Stereotype/bin/Release/*.nupkg  -s https://api.nuget.org/v3/index.json -k $NUGET_API_KEY || echo "The version is there, skipping ..."
+  on:
+    branch: master
+env:
+  secure: TSNT1ufjiG+3g7pxdwHmXPV0/Ol5giYXmnKfG3JJr7iHQWKSBxX5+mg5JW8jb//m0UMxxkzpzK78BF4zCNotSe8c9Bo8oNne5lThrs+5u51Kk7wQ2FDswf//dkLj/PBu1j2cZs3uufiYHZ3D/hs4+1lc/muuIKNh2a80rxlf3SXuhD9UDP+zdcTbaRQLkWreNzYBmaQJpnN8NlT+5jNm6bB+UQ/rXilTKJGg17ujAPjYe2U42BwQQ1RfmJ+8vzSLL/yUGia0UYxyN3DtN0k8D9TqwXob+34uvCBRAUqH+TTbRFAkn3Tuwc3vrDojd7/uWGxMgdOHovlYBBAwvxndeUEpzvNTqLTVj8LHQeGvHl92ipEnKzgMmKxxhJpRhKkO16eV/SRgltRvRjcdO/51IBU4EKHYGO0KkAB7ozswAPW/pxLu2aSX+tUjpfPO9zkyKPp7PnaNTD2PRokghqRz5YFCSCEmqRINfIaiMKp6PtZ0sqaSUsoxQBDNbB3HNu/NNGZ2QzLTU8PtgaYr8k5p/zHYsRWQJsjXv2C+8hoQBV4huz0Qo8rJPnW0TcnjMtJt/y1MblgEg2GqifGYKPYuuTlaHDQ6ZfbSib9TCC/nvLIdEjzeAC8DWJs+lb+8druSxi5cew/T6tP3aQCOCF/8Zn0r+lqbxp3I3qKi/OJ8emE=
