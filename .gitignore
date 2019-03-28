@@ -1,0 +1,8 @@
+*/bin
+*/obj
+*/properties
+**/.vscode
+*/.vs
+*/*.csproj.user
+*.user
+.DS_Store
