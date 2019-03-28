@@ -20,13 +20,13 @@ namespace Example
             }
             Console.WriteLine("Trying to request a materialization");
 
-            var stereotypeClient = new StereotypeClient(args[0]);
+            var stereotypeClient = new StereotypeClient();
             var data = new Data()
             {
                 value1 = "test-value-1",
                 value2 = "test-value-2"
             };
-            var response = stereotypeClient.Request().SetTemplateId("demo.html").Materialize(data).Result.FetchString();
+            var response = stereotypeClient.Request(args[0]).SetTemplateId("demo.html").Materialize(data).Result.FetchString();
             
             Console.WriteLine("Response");
             Console.WriteLine();

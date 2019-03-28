@@ -10,26 +10,23 @@ namespace Cimpress.Stereotype
         private const string StereotypeUrl = "https://stereotype.trdlnk.cimpress.io";
         
         private readonly ILogger _logger;
-                
-        private readonly string _accessToken;
         
         private readonly IStereotypeClientOptions _stereotypeClientOptions;
 
-        public StereotypeClient(string accessToken, ILogger logger = null) : this(accessToken, new StereotypeClientOptions(), logger)
+        public StereotypeClient(ILogger logger = null) : this(new StereotypeClientOptions(), logger)
         {
             
         }
 
-        public StereotypeClient(string accessToken, IStereotypeClientOptions options, ILogger logger = null)
+        public StereotypeClient(IStereotypeClientOptions options, ILogger logger = null)
         {
-            _accessToken = accessToken;
             _stereotypeClientOptions = options;
             _logger = logger ?? new LoggerFactory().CreateLogger("StereotypeClient");
         }
 
-        public IStereotypeRequest Request()
+        public IStereotypeRequest Request(string accessToken)
         {
-            return new StereotypeRequest(_accessToken, _stereotypeClientOptions, _logger);
+            return new StereotypeRequest(accessToken, _stereotypeClientOptions, _logger);
         }
     }
 }
