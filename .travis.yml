@@ -10,9 +10,10 @@ script:
 deploy:
   skip_cleanup: true
   provider: script
-  script: dotnet nuget push Cimpress.Stereotype/bin/Release/*.nupkg  -s https://api.nuget.org/v3/index.json -k $NUGET_API_KEY || echo "The version is there, skipping ..."
+  script: dotnet nuget push Cimpress.Stereotype/bin/Release/*.nupkg  -s https://api.nuget.org/v3/index.json
+    -k $NUGET_API_KEY || echo "The version is there, skipping ..."
   on:
     branch: master
 env:
   global:
-    secure: TSNT1ufjiG+3g7pxdwHmXPV0/Ol5giYXmnKfG3JJr7iHQWKSBxX5+mg5JW8jb//m0UMxxkzpzK78BF4zCNotSe8c9Bo8oNne5lThrs+5u51Kk7wQ2FDswf//dkLj/PBu1j2cZs3uufiYHZ3D/hs4+1lc/muuIKNh2a80rxlf3SXuhD9UDP+zdcTbaRQLkWreNzYBmaQJpnN8NlT+5jNm6bB+UQ/rXilTKJGg17ujAPjYe2U42BwQQ1RfmJ+8vzSLL/yUGia0UYxyN3DtN0k8D9TqwXob+34uvCBRAUqH+TTbRFAkn3Tuwc3vrDojd7/uWGxMgdOHovlYBBAwvxndeUEpzvNTqLTVj8LHQeGvHl92ipEnKzgMmKxxhJpRhKkO16eV/SRgltRvRjcdO/51IBU4EKHYGO0KkAB7ozswAPW/pxLu2aSX+tUjpfPO9zkyKPp7PnaNTD2PRokghqRz5YFCSCEmqRINfIaiMKp6PtZ0sqaSUsoxQBDNbB3HNu/NNGZ2QzLTU8PtgaYr8k5p/zHYsRWQJsjXv2C+8hoQBV4huz0Qo8rJPnW0TcnjMtJt/y1MblgEg2GqifGYKPYuuTlaHDQ6ZfbSib9TCC/nvLIdEjzeAC8DWJs+lb+8druSxi5cew/T6tP3aQCOCF/8Zn0r+lqbxp3I3qKi/OJ8emE=
+    secure: fMTIrTdcUL8H/v4LMeGBtDnWPyTN1ev+SVm9f8AjFaS8vIe25+QRSt4DRF/Ix7GIpf1rif9IS+gumST8gS5J+9NNGi0KhHXGsFG5T9HFaqVBMDr/c2roTzNPnIdlLWwkOmaAdCX18UjpqnfjPMI0zlUh5mmxqbgCjxnkHCrDZB694DIT6RgFNW4sq3zck/uUErDsyeTLcmAV1RfZPSgl3gPqoaBji+8LcgefaPB9yyX90Rt6d504yKtCsXgJHxiJWSQ/ZR+eqUwizkVnsvR3hO2gO9vVJBEqNTnqRt3IdTDXMhOczkDNAafSNRUTcCxpDjBpkdXijmHwF4rCyUH0wtY/rluBgJ6uV4RljHBCzJELarhYczQtJF4TZAmGug8mItZeNXEP5+bET9jhvLmAad63Zs5p8ScNx3eDa4k0IQ9ZjKqFmcD3DwLQjKhN+HtX+BnE50T8/g9M6DNPJB+eI71WalB09Ap4ccGwCM5Lja1/LQziiBab/Xircc/yoM3BpsTTy3ND1fez9MSn72n03i1nu7OClOudt/ARsQdqdk0jbEBZKW6ITOZyFCl/Fgc03F5CGK0ZE3YP0//JD4f6sQjIee1gNRLnTkL0v3S3RGXCh/lWqufIqHdPURQI0gM4/8BjxxUyOJCGAX/zw+bitRkkoNbG38hJHATkWay9pQE=
