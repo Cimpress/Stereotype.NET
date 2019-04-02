@@ -78,8 +78,15 @@ namespace Cimpress.Stereotype
                     {
                         throw new StereotypeException($"Materialization without location", null);
                     }
-                    return new MaterializationResponse(_accessToken, new Uri(_stereotypeClientOptions.ServiceBaseUrl + locationHeaderValue.ToString()),
-                        _logger, _restClient);
+                    
+                    return new MaterializationResponse(
+                        _accessToken, 
+                        new Uri(_stereotypeClientOptions.ServiceBaseUrl + locationHeaderValue.ToString()),
+                        (response.StatusCode == System.Net.HttpStatusCode.Created)
+                            ? response.RawBytes
+                            : null,
+                        _logger,
+                        _restClient);
                 case System.Net.HttpStatusCode.NotFound:
                     return null;
                 case System.Net.HttpStatusCode.Unauthorized:

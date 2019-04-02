@@ -32,6 +32,7 @@ namespace Cimpress.Stereotype.UnitTests
             _materializationResponse = new MaterializationResponse(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZS",
                 new Uri("https://some.site/materialization.json"),
+                null,
                 mockedLogger.Object,
                 mockedRestClient.Object);
 

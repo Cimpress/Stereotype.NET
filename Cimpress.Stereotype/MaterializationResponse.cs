@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
@@ -11,12 +12,14 @@ namespace Cimpress.Stereotype
     public class MaterializationResponse : IMaterializationResponse
     {
         private readonly string _accessToken;
+        private readonly byte[] _rawResponse;
         private readonly ILogger<StereotypeClient> _logger;
         private readonly IRestClient _restClient;
 
-        public MaterializationResponse(string accessToken, Uri uri, ILogger<StereotypeClient> logger, IRestClient restClient)
+        public MaterializationResponse(string accessToken, Uri uri, byte[] rawResponse, ILogger<StereotypeClient> logger, IRestClient restClient)
         {
             Uri = uri;
+            _rawResponse = rawResponse;
             _accessToken = accessToken;
             _logger = logger;
             _restClient = restClient;
@@ -24,10 +27,14 @@ namespace Cimpress.Stereotype
 
         public async Task<byte[]> FetchBytes()
         {
+            if (_rawResponse != null)
+            {
+                return _rawResponse;
+            }
+            
             var request = new RestRequest(Uri, Method.GET);
             request.JsonSerializer = new JsonSerializer();
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
-            request.AddHeader("Content-type", "application/json");
             _logger?.LogDebug($">> GET {Uri}");
             var response = await _restClient.ExecuteTaskAsync(request);
             _logger?.LogDebug($"<< GET {Uri} :: {response.StatusCode}");
@@ -43,6 +50,7 @@ namespace Cimpress.Stereotype
                 
                 case System.Net.HttpStatusCode.Unauthorized:
                     throw new AuthenticationException("Incorrect authentication");
+                
                 case System.Net.HttpStatusCode.Forbidden:
                     throw new AuthorizationException("Insufficient permission level to access materialization");
 

@@ -18,9 +18,9 @@ namespace Cimpress.Stereotype
             
         }
         
-        public StereotypeClient(ILogger<StereotypeClient> logger) : this(new StereotypeClientOptions(), logger)
+        public StereotypeClient(IStereotypeClientOptions options)
         {
-            
+            _stereotypeClientOptions = options;
         }
 
         public StereotypeClient(IStereotypeClientOptions options, ILogger<StereotypeClient> logger)
