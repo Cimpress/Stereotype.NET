@@ -46,7 +46,7 @@ namespace Cimpress.Stereotype
             return this;
         }
         
-        public IStereotypeRequest SetExpectation(string contentType, decimal probability)
+        public IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m)
         {
             _expectations.Add($"{contentType};q={probability}");
             return this;
