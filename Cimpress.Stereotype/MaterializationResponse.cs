@@ -16,6 +16,13 @@ namespace Cimpress.Stereotype
         private readonly ILogger<StereotypeClient> _logger;
         private readonly IRestClient _restClient;
 
+
+        public MaterializationResponse(string accessToken, Uri uri, ILogger<StereotypeClient> logger) : this(accessToken, uri, null, logger,
+            new RestClient())
+        {
+            
+        }
+
         public MaterializationResponse(string accessToken, Uri uri, byte[] rawResponse, ILogger<StereotypeClient> logger, IRestClient restClient)
         {
             Uri = uri;

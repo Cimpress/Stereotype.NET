@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -14,6 +16,8 @@ namespace Cimpress.Stereotype
         private readonly ILogger<StereotypeClient> _logger;
         
         private readonly IStereotypeClientOptions _stereotypeClientOptions;
+        
+        private readonly IList<string> _expectations = new List<string>();
         
         private readonly string _accessToken;
         
@@ -42,9 +46,9 @@ namespace Cimpress.Stereotype
             return this;
         }
         
-        public IStereotypeRequest SetAcceptHeader(string acceptHeader)
+        public IStereotypeRequest SetExpectation(string contentType, decimal probability)
         {
-            _acceptHeader = acceptHeader;
+            _expectations.Add($"{contentType};q={probability}");
             return this;
         }
 
@@ -52,17 +56,18 @@ namespace Cimpress.Stereotype
         {
             var request = new RestRequest("/v1/templates/{templateId}/materializations", Method.POST);
             request.JsonSerializer = new JsonSerializer();
+            request.AddUrlSegment("templateId", _templateId);
+            request.AddJsonBody(payload);
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
-            if (!string.IsNullOrEmpty(_acceptHeader))
+            if (_expectations.Count > 0)
             {
-                request.AddHeader("Accept", _acceptHeader);
+                request.AddHeader("Accept", string.Join(", ", _expectations.ToArray()));
             }
-            request.AddUrlSegment("templateId", _templateId);
-            _logger?.LogInformation($">> POST /v1/templates/{_templateId}/materializations");
-            
-            request.AddJsonBody(payload);
+
+            _logger?.LogInformation($">> POST /v1/templates/{_templateId}/materializations");            
             var response = await _restClient.ExecuteTaskAsync(request);
+            
             _logger?.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {response.StatusCode}");
             switch (response.StatusCode)
             {

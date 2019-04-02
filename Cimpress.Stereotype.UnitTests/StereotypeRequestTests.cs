@@ -29,7 +29,9 @@ namespace Cimpress.Stereotype.UnitTests
             mockedRestResponse.Setup(a => a.Headers).Returns(new List<Parameter>() { new Parameter("Location", "/materialization/1122", ParameterType.HttpHeader)});
             mockedRestResponse.Setup(a => a.StatusCode).Returns(HttpStatusCode.OK);
 
-            mockedRestClient.Setup(a => a.ExecuteTaskAsync(It.IsAny<IRestRequest>())).ReturnsAsync(mockedRestResponse.Object);
+            mockedRestClient.Setup(a => a.ExecuteTaskAsync(It.IsAny<IRestRequest>()))
+                .ReturnsAsync(mockedRestResponse.Object);
+            
             _stereotypeRequest = new StereotypeRequest(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZS",
                 new StereotypeClientOptions(), 
@@ -37,6 +39,7 @@ namespace Cimpress.Stereotype.UnitTests
                 mockedRestClient.Object);
 
             var materialization = _stereotypeRequest.SetTemplateId("test-template").Materialize<string>("something");
+
             Assert.Equal("https://stereotype.trdlnk.cimpress.io/materialization/1122", materialization.Result.Uri.ToString());
         }
     }
