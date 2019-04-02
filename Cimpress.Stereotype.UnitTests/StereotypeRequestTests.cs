@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using Cimpress.TagliatelleNetCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using Xunit;
 
@@ -18,7 +15,7 @@ namespace Cimpress.Stereotype.UnitTests
         [Fact]
         public void MaterializeTriggersMaterialization()
         {
-            var mockedLogger = new Mock<Microsoft.Extensions.Logging.ILogger>();
+            var mockedLogger = new Mock<Microsoft.Extensions.Logging.ILogger<StereotypeClient>>();
             mockedLogger.Setup(a => a.Log<object>(   
                 It.IsAny<Microsoft.Extensions.Logging.LogLevel>(), 
                 It.IsAny<EventId>(), 

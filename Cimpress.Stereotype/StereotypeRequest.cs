@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RestSharp;
 
 namespace Cimpress.Stereotype
@@ -12,7 +11,7 @@ namespace Cimpress.Stereotype
     {
         private const string StereotypeUrl = "https://stereotype.trdlnk.cimpress.io";
         
-        private readonly ILogger _logger;
+        private readonly ILogger<StereotypeClient> _logger;
         
         private readonly IStereotypeClientOptions _stereotypeClientOptions;
         
@@ -21,8 +20,10 @@ namespace Cimpress.Stereotype
         private readonly IRestClient _restClient;
         
         private string _templateId;
+        
+        private string _acceptHeader;
 
-        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger, IRestClient restClient)
+        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger<StereotypeClient> logger, IRestClient restClient)
         {
             _stereotypeClientOptions = options;
             _accessToken = accessToken;
@@ -30,7 +31,7 @@ namespace Cimpress.Stereotype
             _restClient = restClient;
         }
         
-        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger) : this(accessToken, options, logger,  new RestClient(options.ServiceBaseUrl))
+        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger<StereotypeClient> logger) : this(accessToken, options, logger,  new RestClient(options.ServiceBaseUrl))
         {
            
         }
@@ -40,6 +41,12 @@ namespace Cimpress.Stereotype
             _templateId = templateId;
             return this;
         }
+        
+        public IStereotypeRequest SetAcceptHeader(string acceptHeader)
+        {
+            _acceptHeader = acceptHeader;
+            return this;
+        }
 
         public async Task<IMaterializationResponse> Materialize<TO>(TO payload)
         {
@@ -47,11 +54,16 @@ namespace Cimpress.Stereotype
             request.JsonSerializer = new JsonSerializer();
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
+            if (!string.IsNullOrEmpty(_acceptHeader))
+            {
+                request.AddHeader("Accept", _acceptHeader);
+            }
             request.AddUrlSegment("templateId", _templateId);
-            _logger.LogInformation($">> POST /v1/templates/{_templateId}/materializations");
+            _logger?.LogInformation($">> POST /v1/templates/{_templateId}/materializations");
+            
             request.AddJsonBody(payload);
             var response = await _restClient.ExecuteTaskAsync(request);
-            _logger.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {response.StatusCode}");
+            _logger?.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {response.StatusCode}");
             switch (response.StatusCode)
             {
                 case System.Net.HttpStatusCode.OK:

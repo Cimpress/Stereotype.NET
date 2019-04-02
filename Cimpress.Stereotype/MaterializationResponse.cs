@@ -11,20 +11,15 @@ namespace Cimpress.Stereotype
     public class MaterializationResponse : IMaterializationResponse
     {
         private readonly string _accessToken;
-        private readonly ILogger _logger;
+        private readonly ILogger<StereotypeClient> _logger;
         private readonly IRestClient _restClient;
 
-        public MaterializationResponse(string accessToken, Uri uri, ILogger logger, IRestClient restClient)
+        public MaterializationResponse(string accessToken, Uri uri, ILogger<StereotypeClient> logger, IRestClient restClient)
         {
             Uri = uri;
             _accessToken = accessToken;
             _logger = logger;
             _restClient = restClient;
-        }
-        
-        public MaterializationResponse(string accessToken, Uri uri, ILogger logger) : this(accessToken, uri, logger, new RestClient())
-        {
-           
         }
 
         public async Task<byte[]> FetchBytes()
@@ -33,9 +28,9 @@ namespace Cimpress.Stereotype
             request.JsonSerializer = new JsonSerializer();
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
-            _logger.LogDebug($">> GET {Uri}");
+            _logger?.LogDebug($">> GET {Uri}");
             var response = await _restClient.ExecuteTaskAsync(request);
-            _logger.LogDebug($"<< GET {Uri} :: {response.StatusCode}");
+            _logger?.LogDebug($"<< GET {Uri} :: {response.StatusCode}");
             switch (response.StatusCode)
             {
                 case System.Net.HttpStatusCode.OK:
