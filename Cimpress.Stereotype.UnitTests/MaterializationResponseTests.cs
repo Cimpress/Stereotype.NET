@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using Cimpress.TagliatelleNetCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using Xunit;
 
@@ -18,7 +14,7 @@ namespace Cimpress.Stereotype.UnitTests
         [Fact]
         public void FetchesMaterializationBytesFromUrl()
         {
-            var mockedLogger = new Mock<Microsoft.Extensions.Logging.ILogger>();
+            var mockedLogger = new Mock<ILogger<StereotypeClient>>();
             mockedLogger.Setup(a => a.Log<object>(   
                 It.IsAny<Microsoft.Extensions.Logging.LogLevel>(), 
                 It.IsAny<EventId>(), 
@@ -36,6 +32,7 @@ namespace Cimpress.Stereotype.UnitTests
             _materializationResponse = new MaterializationResponse(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZS",
                 new Uri("https://some.site/materialization.json"),
+                null,
                 mockedLogger.Object,
                 mockedRestClient.Object);
 

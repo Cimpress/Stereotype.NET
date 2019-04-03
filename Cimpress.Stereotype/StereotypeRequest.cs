@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RestSharp;
 
 namespace Cimpress.Stereotype
@@ -12,17 +13,21 @@ namespace Cimpress.Stereotype
     {
         private const string StereotypeUrl = "https://stereotype.trdlnk.cimpress.io";
         
-        private readonly ILogger _logger;
+        private readonly ILogger<StereotypeClient> _logger;
         
         private readonly IStereotypeClientOptions _stereotypeClientOptions;
+        
+        private readonly IList<string> _expectations = new List<string>();
         
         private readonly string _accessToken;
         
         private readonly IRestClient _restClient;
         
         private string _templateId;
+        
+        private string _acceptHeader;
 
-        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger, IRestClient restClient)
+        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger<StereotypeClient> logger, IRestClient restClient)
         {
             _stereotypeClientOptions = options;
             _accessToken = accessToken;
@@ -30,7 +35,7 @@ namespace Cimpress.Stereotype
             _restClient = restClient;
         }
         
-        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger logger) : this(accessToken, options, logger,  new RestClient(options.ServiceBaseUrl))
+        public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger<StereotypeClient> logger) : this(accessToken, options, logger,  new RestClient(options.ServiceBaseUrl))
         {
            
         }
@@ -40,18 +45,30 @@ namespace Cimpress.Stereotype
             _templateId = templateId;
             return this;
         }
+        
+        public IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m)
+        {
+            _expectations.Add($"{contentType};q={probability}");
+            return this;
+        }
 
         public async Task<IMaterializationResponse> Materialize<TO>(TO payload)
         {
             var request = new RestRequest("/v1/templates/{templateId}/materializations", Method.POST);
             request.JsonSerializer = new JsonSerializer();
+            request.AddUrlSegment("templateId", _templateId);
+            request.AddJsonBody(payload);
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
-            request.AddUrlSegment("templateId", _templateId);
-            _logger.LogInformation($">> POST /v1/templates/{_templateId}/materializations");
-            request.AddJsonBody(payload);
+            if (_expectations.Count > 0)
+            {
+                request.AddHeader("Accept", string.Join(", ", _expectations.ToArray()));
+            }
+
+            _logger?.LogInformation($">> POST /v1/templates/{_templateId}/materializations");            
             var response = await _restClient.ExecuteTaskAsync(request);
-            _logger.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {response.StatusCode}");
+            
+            _logger?.LogInformation($"<< POST /v1/templates/{_templateId}/materializations :: {response.StatusCode}");
             switch (response.StatusCode)
             {
                 case System.Net.HttpStatusCode.OK:
@@ -66,8 +83,15 @@ namespace Cimpress.Stereotype
                     {
                         throw new StereotypeException($"Materialization without location", null);
                     }
-                    return new MaterializationResponse(_accessToken, new Uri(_stereotypeClientOptions.ServiceBaseUrl + locationHeaderValue.ToString()),
-                        _logger, _restClient);
+                    
+                    return new MaterializationResponse(
+                        _accessToken, 
+                        new Uri(_stereotypeClientOptions.ServiceBaseUrl + locationHeaderValue.ToString()),
+                        (response.StatusCode == System.Net.HttpStatusCode.Created)
+                            ? response.RawBytes
+                            : null,
+                        _logger,
+                        _restClient);
                 case System.Net.HttpStatusCode.NotFound:
                     return null;
                 case System.Net.HttpStatusCode.Unauthorized:
