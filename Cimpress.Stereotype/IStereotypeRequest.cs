@@ -6,6 +6,8 @@ namespace Cimpress.Stereotype
     {
         IStereotypeRequest SetTemplateId(string templateId);
 
+        IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m);
+
         Task<IMaterializationResponse> Materialize<TO>(TO payload);
     }
 }
