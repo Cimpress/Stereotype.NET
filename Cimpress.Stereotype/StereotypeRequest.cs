@@ -19,7 +19,13 @@ namespace Cimpress.Stereotype
         
         private readonly IList<string> _expectations = new List<string>();
         
+        private readonly IList<string> _whiteListRels = new List<string>();
+        
+        private readonly IList<string> _blackListRels = new List<string>();
+        
         private readonly string _accessToken;
+
+        private ResponseMode _responseMode = ResponseMode.RespondSync;
         
         private readonly IRestClient _restClient;
         
@@ -52,6 +58,24 @@ namespace Cimpress.Stereotype
             return this;
         }
 
+        public IStereotypeRequest SetWhiteList(string whiteListEntry)
+        {
+            _whiteListRels.Add(whiteListEntry);
+            return this;
+        }
+
+        public IStereotypeRequest SetBlackList(string blackListEntry)
+        {
+            _blackListRels.Add(blackListEntry);
+            return this;
+        }
+
+        public IStereotypeRequest SetPreferRespondMode(ResponseMode responseMode)
+        {
+            _responseMode = responseMode;
+            return this;
+        }
+
         public async Task<IMaterializationResponse> Materialize<TO>(TO payload)
         {
             var request = new RestRequest("/v1/templates/{templateId}/materializations", Method.POST);
@@ -60,6 +84,22 @@ namespace Cimpress.Stereotype
             request.AddJsonBody(payload);
             request.AddHeader("Authorization", $"Bearer {_accessToken}");
             request.AddHeader("Content-type", "application/json");
+
+            if (_responseMode == ResponseMode.RespondAsync)
+            {
+                request.AddHeader("prefer", "respond-async");
+            }
+
+            if (_whiteListRels.Count > 0)
+            {
+                request.AddHeader("x-cimpress-rel-whitelist", string.Join(",", _whiteListRels.ToArray())); 
+            }
+            
+            if (_blackListRels.Count > 0)
+            {
+                request.AddHeader("x-cimpress-rel-blacklist", string.Join(",", _blackListRels.ToArray())); 
+            }
+            
             if (_expectations.Count > 0)
             {
                 request.AddHeader("Accept", string.Join(", ", _expectations.ToArray()));

@@ -7,6 +7,12 @@ namespace Cimpress.Stereotype
         IStereotypeRequest SetTemplateId(string templateId);
 
         IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m);
+        
+        IStereotypeRequest SetWhiteList(string whiteListEntry);
+        
+        IStereotypeRequest SetBlackList(string blackListEntry);
+        
+        IStereotypeRequest SetPreferRespondMode(ResponseMode responseMode);
 
         Task<IMaterializationResponse> Materialize<TO>(TO payload);
     }
