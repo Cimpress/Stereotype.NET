@@ -58,13 +58,13 @@ namespace Cimpress.Stereotype
             return this;
         }
 
-        public IStereotypeRequest SetWhiteList(string whiteListEntry)
+        public IStereotypeRequest WithWhitelistedRelation(string whiteListEntry)
         {
             _whiteListRels.Add(whiteListEntry);
             return this;
         }
 
-        public IStereotypeRequest SetBlackList(string blackListEntry)
+        public IStereotypeRequest WithBlacklistedRelation(string blackListEntry)
         {
             _blackListRels.Add(blackListEntry);
             return this;

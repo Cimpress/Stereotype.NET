@@ -8,9 +8,9 @@ namespace Cimpress.Stereotype
 
         IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m);
         
-        IStereotypeRequest SetWhiteList(string whiteListEntry);
+        IStereotypeRequest WithWhitelistedRelation(string whiteListEntry);
         
-        IStereotypeRequest SetBlackList(string blackListEntry);
+        IStereotypeRequest WithBlacklistedRelation(string blackListEntry);
         
         IStereotypeRequest SetPreferRespondMode(ResponseMode responseMode);
 
