@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Cimpress.Stereotype
@@ -7,6 +8,8 @@ namespace Cimpress.Stereotype
         IStereotypeRequest SetTemplateId(string templateId);
 
         IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m);
+
+        IStereotypeRequest SetRetentionPeriod(TimeSpan retentionDuration);
         
         IStereotypeRequest WithWhitelistedRelation(string whiteListEntry);
         
