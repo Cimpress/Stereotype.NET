@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Trdelnik Squad &lt;TrdelnikSquad@cimpress.com&gt;</Authors>
     <Company>Cimpress</Company>
     <Product>Fulfillment Location Client for .NET Core</Product>
     <PackageId>Cimpress.Stereotype</PackageId>
     <Description>Client for using Stereotype</Description>
-    <PackageVersion>0.2.0</PackageVersion>
+    <PackageVersion>0.2.1</PackageVersion>
     <Title>Cimpress Stereotype Client</Title>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cimpress.TagliatelleNetCore" Version="0.0.4" />
+    <PackageReference Include="Iso8601Duration" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="RestSharp" Version="106.6.9" />

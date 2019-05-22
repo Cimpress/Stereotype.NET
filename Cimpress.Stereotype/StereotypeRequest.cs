@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Cimpress.Stereotype.Exceptions;
+using Iso8601Duration;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 
@@ -31,7 +32,9 @@ namespace Cimpress.Stereotype
         
         private string _templateId;
         
-        private string _acceptHeader;
+        private TimeSpan? _retentionDuration;
+        
+        private PeriodBuilder _periodBuilder;
 
         public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger<StereotypeClient> logger, IRestClient restClient)
         {
@@ -39,6 +42,8 @@ namespace Cimpress.Stereotype
             _accessToken = accessToken;
             _logger = logger;
             _restClient = restClient;
+            _periodBuilder = new PeriodBuilder();
+
         }
         
         public StereotypeRequest(string accessToken, IStereotypeClientOptions options, ILogger<StereotypeClient> logger) : this(accessToken, options, logger,  new RestClient(options.ServiceBaseUrl))
@@ -75,6 +80,12 @@ namespace Cimpress.Stereotype
             _responseMode = responseMode;
             return this;
         }
+        
+        public IStereotypeRequest SetRetentionPeriod(TimeSpan retentionDuration)
+        {
+            _retentionDuration = retentionDuration;
+            return this;
+        }
 
         public async Task<IMaterializationResponse> Materialize<TO>(TO payload)
         {
@@ -98,6 +109,11 @@ namespace Cimpress.Stereotype
             if (_blackListRels.Count > 0)
             {
                 request.AddHeader("x-cimpress-rel-blacklist", string.Join(",", _blackListRels.ToArray())); 
+            }
+
+            if (_retentionDuration.HasValue)
+            {
+                request.AddHeader("x-cimpress-retention-duration", _periodBuilder.ToString(_retentionDuration.Value));
             }
             
             if (_expectations.Count > 0)
