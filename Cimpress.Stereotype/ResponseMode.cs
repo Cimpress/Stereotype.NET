@@ -2,7 +2,8 @@ namespace Cimpress.Stereotype
 {
     public enum ResponseMode
     {
-        RespondSync,
-        RespondAsync
+        Synchronous, // body
+        Asynchronous, // location
+        AsynchronousPoll // body + location
     }
 }
