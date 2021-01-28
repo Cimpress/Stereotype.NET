@@ -15,7 +15,7 @@ namespace Cimpress.Stereotype
         
         IStereotypeRequest WithBlacklistedRelation(string blackListEntry);
         
-        IStereotypeRequest SetPreferRespondMode(ResponseMode responseMode);
+        IStereotypeRequest SetResponseMode(ResponseMode responseMode);
 
         Task<IMaterializationResponse> Materialize<TO>(TO payload);
     }
