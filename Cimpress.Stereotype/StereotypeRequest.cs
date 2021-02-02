@@ -87,6 +87,12 @@ namespace Cimpress.Stereotype
             return this;
         }
 
+        public IStereotypeRequest SetTimeout(TimeSpan timeout)
+        {
+            _timeout = timeout;
+            return this;
+        }
+
         private async Task<IMaterializationResponse> GetMaterializationResponse(string location, TimeSpan timeout)
         {
             IRestResponse response = null;
@@ -137,11 +143,12 @@ namespace Cimpress.Stereotype
                 case System.Net.HttpStatusCode.Forbidden:
                     throw new AuthorizationException("Insufficient permissions to perform action");
                 default:
-                    if (response.StatusCode == 0 && response.ErrorMessage?.IndexOf("The request timed-out.") != -1)
+                    if (response?.ErrorException is System.Net.WebException && response.ErrorException?.Message?.IndexOf("timed out.") != -1 ||
+                        response.StatusCode == 0 && response.ErrorMessage?.IndexOf("The request timed-out.") != -1)
                     {
                         throw new TimeoutException("The request to Stereotyped timed out.");
                     }
-                    _logger.LogError(response.ErrorException.ToString());
+                    _logger.LogError(response.ErrorException?.ToString());
                     throw new StereotypeException($"Unexpected status code {response.StatusCode}", null);
             }
         }
@@ -201,7 +208,8 @@ namespace Cimpress.Stereotype
                 case System.Net.HttpStatusCode.Forbidden:
                     throw new AuthorizationException("Insufficient permissions to perform action");
                 default:
-                    if (response.StatusCode == 0 && response.ErrorMessage?.IndexOf("The request timed-out.") != -1)
+                    if (response?.ErrorException is System.Net.WebException && response.ErrorException?.Message?.IndexOf("timed out.") != -1 ||
+                        response.StatusCode == 0 && response.ErrorMessage?.IndexOf("The request timed-out.") != -1)
                     {
                         throw new TimeoutException("The request to Stereotyped timed out.");
                     }
