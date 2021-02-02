@@ -10,6 +10,8 @@ namespace Cimpress.Stereotype
         IStereotypeRequest SetExpectation(string contentType, decimal probability = 1m);
 
         IStereotypeRequest SetRetentionPeriod(TimeSpan retentionDuration);
+
+        IStereotypeRequest SetTimeout(TimeSpan timeout);
         
         IStereotypeRequest WithWhitelistedRelation(string whiteListEntry);
         
