@@ -9,7 +9,7 @@
     <Product>Fulfillment Location Client for .NET Core</Product>
     <PackageId>Cimpress.Stereotype</PackageId>
     <Description>Client for using Stereotype</Description>
-    <PackageVersion>0.3.0</PackageVersion>
+    <PackageVersion>0.3.1</PackageVersion>
     <Title>Cimpress Stereotype Client</Title>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
